@@ -60,11 +60,20 @@ target_link_libraries(${LIB_NAME}
 # Specify include directories.
 target_include_directories(${LIB_NAME} PRIVATE ${STB_PATH})
 
-set(TEST_NAME live2d)
+add_custom_command(
+	TARGET ${LIB_NAME}
+	POST_BUILD
+	COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/include
+	COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/src/Live2DSprite.hpp ${CMAKE_CURRENT_BINARY_DIR}/include
+	COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/cubism/Samples/Resources ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+
+set(TEST_NAME live2d-sprite)
 add_executable(${TEST_NAME})
 set(TEST_PATH ${CMAKE_CURRENT_SOURCE_DIR}/test)
 target_link_libraries(${TEST_NAME}
 	${LIB_NAME}
 )
 add_subdirectory(test)
-target_include_directories(${TEST_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(${TEST_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include)
