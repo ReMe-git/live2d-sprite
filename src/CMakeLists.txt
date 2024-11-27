@@ -1,0 +1,21 @@
+target_sources(${LIB_NAME}
+PRIVATE
+	${CMAKE_CURRENT_SOURCE_DIR}/LAppAllocator.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/LAppAllocator.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/LAppDefine.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/LAppDefine.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/LAppPal.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/LAppPal.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/LAppTextureManager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/LAppTextureManager.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/TouchManager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/TouchManager.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/CubismUserModelExtend.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/CubismUserModelExtend.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/CubismSampleViewMatrix.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/CubismSampleViewMatrix.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/MouseActionManager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/MouseActionManager.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Live2DSprite.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Live2DSprite.cpp
+)
