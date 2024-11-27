@@ -8,8 +8,9 @@ public:
 	~Live2DSprite();
 	void InitializeCubism();
 	void SetExecuteAbsolutePath();
+	void SetModelDirectory(const std::string modelDirectoryName);
 	bool InitializeSystem();
 	void Release();
-	void LoadModel(const std::string modelDirectoryName);
-	bool Update();
+	void LoadModel(const std::string modelName);
+	void Update();
 }; // Live2DSprite

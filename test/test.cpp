@@ -4,13 +4,17 @@
 
 
 int main(int argc, char **argv) {
-	Live2DSprite app;
+	Live2DSprite sprite;
 
-	if (app.InitializeSystem() == false)
+	if (sprite.InitializeSystem() == false)
 		return 0;
-	app.LoadModel("Hiyori");
+	
+	sprite.SetModelDirectory("Resources/");
+	sprite.LoadModel("Hiyori");
 
-	while (app.Update() == true);
+	while (true) {
+		sprite.Update();
+	}
 
-	app.Release();
+	sprite.Release();
 }

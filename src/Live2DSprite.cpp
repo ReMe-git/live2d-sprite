@@ -119,7 +119,7 @@ bool Live2DSprite::InitializeSystem()
     }
 
     // Windowの生成
-    _window = glfwCreateWindow(LAppDefine::RenderTargetWidth, LAppDefine::RenderTargetHeight, "SIMPLE_SAMPLE", NULL, NULL);
+    _window = glfwCreateWindow(LAppDefine::RenderTargetWidth, LAppDefine::RenderTargetHeight, "Live2DSprite", NULL, NULL);
     if (_window == NULL)
     {
         LAppPal::PrintLogLn("Can't create GLFW window.");
@@ -199,24 +199,24 @@ void Live2DSprite::Release()
 *
 * @param[in] modelDirectory モデルのディレクトリ名
 */
-void Live2DSprite::LoadModel(const std::string modelDirectoryName)
+void Live2DSprite::LoadModel(const std::string modelName)
 {
     // モデルのディレクトリを指定
-    _currentModelDirectory = _executeAbsolutePath + LAppDefine::ResourcesPath + modelDirectoryName + "/";
+    _currentModelDirectory = _executeAbsolutePath + LAppDefine::ResourcesPath + modelName + "/";
 
     // モデルデータの新規生成
-    _userModel = new CubismUserModelExtend(modelDirectoryName, _currentModelDirectory);
+    _userModel = new CubismUserModelExtend(modelName, _currentModelDirectory);
 
     // モデルデータの読み込み及び生成とセットアップを行う
     std::string json = ".model3.json";
-    std::string fileName = modelDirectoryName + json;
+    std::string fileName = modelName + json;
     static_cast<CubismUserModelExtend*>(_userModel)->LoadAssets(fileName.c_str());
 
     // ユーザーモデルをMouseActionManagerへ渡す
     MouseActionManager::GetInstance()->SetUserModel(_userModel);
 }
 
-bool Live2DSprite::Update() {
+void Live2DSprite::Update() {
     //メインループ
     if (glfwWindowShouldClose(_window) == GL_FALSE) {
         int width, height;
@@ -256,9 +256,9 @@ bool Live2DSprite::Update() {
         // Poll for and process events
         glfwPollEvents();
 		
-		return true;
-    } else {
-		return false;
-	}
+    }
 }
 
+void Live2DSprite::SetModelDirectory(const std::string modelDirectoryName) {
+	_currentModelDirectory = modelDirectoryName;
+}
