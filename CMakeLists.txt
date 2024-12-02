@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 
+project(live2DSprite)
 # Set lib name.
-set(LIB_NAME Live2DSprite)
+set(LIB_NAME live2DSprite)
 
 # Set directory paths.
 set(CORE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cubism/Core)

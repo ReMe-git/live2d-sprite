@@ -5,8 +5,9 @@ live2d library build with CubismNativeSDK and OpenGL.
 ## Building:
 1. download CubismNativeSDK and unzip it to cubism/;
 2. use srcipts in thrid_party/scripts to download OpenGL libraries;
-3. use make to build, you will find libLive2DSprite.a in build/;
-4. run live2d in build/ to test.
+3. use "make release" to build, you will find liblive2DSprite.a in build/;
+4. use "make debug" to build with debug flag;
+5. run live2d in build/ to test.
 
 ## Use in another project
 add these into your CMakeLists.txt
