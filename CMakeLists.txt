@@ -10,16 +10,11 @@ set(FRAMEWORK_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cubism/Framework)
 set(THIRD_PARTY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
 set(STB_PATH ${THIRD_PARTY_PATH}/stb)
 set(GLEW_PATH ${THIRD_PARTY_PATH}/glew)
-set(GLFW_PATH ${THIRD_PARTY_PATH}/glfw)
 
 # Force static library.
 add_library(${LIB_NAME} STATIC)
 
 # Surpress GLEW and GLFW process.
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 set(BUILD_UTILS OFF CACHE BOOL "" FORCE)
 
 # Add Cubism Core.
@@ -32,7 +27,7 @@ set_target_properties(Live2DCubismCore
     INTERFACE_INCLUDE_DIRECTORIES ${CORE_PATH}/include
 )
 
-# Add GLEW ,GLFW.
+# Add GLEW.
 add_subdirectory(${GLEW_PATH}/build/cmake ${CMAKE_CURRENT_BINARY_DIR}/glew)
 
 # Specify Cubism Framework rendering.
