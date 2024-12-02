@@ -33,7 +33,6 @@ set_target_properties(Live2DCubismCore
 
 # Add GLEW ,GLFW.
 add_subdirectory(${GLEW_PATH}/build/cmake ${CMAKE_CURRENT_BINARY_DIR}/glew)
-add_subdirectory(${GLFW_PATH} ${CMAKE_CURRENT_BINARY_DIR}/glfw)
 
 # Specify Cubism Framework rendering.
 set(FRAMEWORK_SOURCE OpenGL)
@@ -49,13 +48,15 @@ target_link_libraries(Framework Live2DCubismCore glew_s)
 # Find opengl libraries.
 find_package(OpenGL REQUIRED)
 
+# Find SDL libraries
+find_package(SDL2 REQUIRED)
+
 # Add source files.
 add_subdirectory(src)
 # Link libraries to app.
 target_link_libraries(${LIB_NAME}
   Framework
-  glfw
-  ${OPENGL_LIBRARIES}
+  SDL2::SDL2
 )
 # Specify include directories.
 target_include_directories(${LIB_NAME} PRIVATE ${STB_PATH})
@@ -64,7 +65,7 @@ add_custom_command(
 	TARGET ${LIB_NAME}
 	POST_BUILD
 	COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/include
-	COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/src/Live2DSprite.hpp ${CMAKE_CURRENT_BINARY_DIR}/include
+	COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/src/live2DSprite.hpp ${CMAKE_CURRENT_BINARY_DIR}/include
 	COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/cubism/Samples/Resources ${CMAKE_CURRENT_BINARY_DIR}
 )
 
