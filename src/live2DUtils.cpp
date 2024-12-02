@@ -75,8 +75,6 @@ void live2DUtils::updateTime()
     lastFrame = currentFrame;
 }
 
-using namespace Csm;
-
 void* live2DUtils::Allocate(const csmSizeType size)
 {
     return malloc(size);

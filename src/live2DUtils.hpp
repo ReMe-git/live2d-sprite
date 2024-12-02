@@ -2,7 +2,6 @@
 #define LIVE2D_UTILS
 
 #include <CubismFramework.hpp>
-#include <CubismFramework.hpp>
 #include <cstdlib>
 #include <string>
 

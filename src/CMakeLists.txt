@@ -1,7 +1,7 @@
 target_sources(${LIB_NAME}
 PRIVATE
-	${CMAKE_CURRENT_SOURCE_DIR}/live2DSprite.hpp
-	${CMAKE_CURRENT_SOURCE_DIR}/live2DSprite.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/live2DManager.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/live2DManager.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/live2DUtils.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/live2DUtils.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/live2DModel.hpp

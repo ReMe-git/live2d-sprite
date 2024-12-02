@@ -66,7 +66,7 @@ add_custom_command(
 	TARGET ${LIB_NAME}
 	POST_BUILD
 	COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/include
-	COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/src/live2DSprite.hpp ${CMAKE_CURRENT_BINARY_DIR}/include
+	COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/src/live2DManager.hpp ${CMAKE_CURRENT_BINARY_DIR}/include
 	COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/cubism/Samples/Resources ${CMAKE_CURRENT_BINARY_DIR}
 )
 

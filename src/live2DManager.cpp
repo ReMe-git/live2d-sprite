@@ -1,4 +1,5 @@
 // include(s)
+#include <string>
 #include <unistd.h>
 #include <libgen.h>
 #include <GL/glew.h>
@@ -6,7 +7,7 @@
 
 #include "live2DModel.hpp"
 #include "live2DUtils.hpp"
-#include "live2DSprite.hpp"
+#include "live2DManager.hpp"
 
 // namespace(s)
 // define(s)
@@ -16,60 +17,44 @@ live2DModel *userModel;
 live2DUtils live2DTools;
 Csm::CubismFramework::Option cubismOption;
 
-std::string executeAbsolutePath;
-std::string modelDirectory;
+std::string resourceDirectory;
 
 SDL_Window* sdl_window;
+SDL_GLContext sdl_glContext;
 int windowWidth, windowHeight;
 
 // function(s)
-live2DSprite::live2DSprite() {
-
-}
-
-live2DSprite::~live2DSprite() {
-
-}
-
-void live2DSprite::InitializeCubism()
+live2DManager::live2DManager(std::string modelDirectoryName)
 {
-    //setup cubism
-    cubismOption.LogFunction = live2DUtils::printMessage;
-    cubismOption.LoggingLevel = Csm::CubismFramework::Option::LogLevel_Verbose;
-    Csm::CubismFramework::StartUp(&live2DTools, &cubismOption);
-
-    //Initialize cubism
-    Csm::CubismFramework::Initialize();
+    userModel = NULL;
+    resourceDirectory = modelDirectoryName;
 }
 
-void live2DSprite::SetExecuteAbsolutePath()
-{
-    const int maximumPathBufferSize = 1024;
-    char path[maximumPathBufferSize];
-    ssize_t len = readlink("/proc/self/exe", path, maximumPathBufferSize - 1);
-
-    if (len != -1)
-    {
-        path[len] = '\0';
-    }
-
-    executeAbsolutePath = dirname(path);
-    executeAbsolutePath += "/";
+live2DManager::~live2DManager() {
+    releaseModel();
+    Csm::CubismFramework::Dispose();
+    SDL_GL_DeleteContext(sdl_glContext);
 }
 
-bool live2DSprite::InitializeSystem(SDL_Window *window)
+bool live2DManager::initializeSystem(SDL_Window *window)
 {
     if (window == NULL) {
         live2DUtils::printLogLn("Invalid SDL Window");
-        return SDL_FALSE;
+        return false;
     }
     sdl_window = window;
-    live2DUtils::printLogLn("START");
+ 
+	sdl_glContext = SDL_GL_CreateContext(window); 
+    if (sdl_glContext == NULL) {
+        live2DUtils::printLogLn("Can't make openGL context, %s", SDL_GetError());
+        return false;
+    }
+	SDL_GL_MakeCurrent(sdl_window, sdl_glContext);
+
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
         live2DUtils::printLogLn("Can't initilize glew.");
-
-        return GL_FALSE;
+        return false;
     }
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -77,39 +62,45 @@ bool live2DSprite::InitializeSystem(SDL_Window *window)
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
+
     SDL_GetWindowSize(sdl_window, &windowWidth, &windowHeight);
     glViewport(0, 0, windowWidth, windowHeight);
 
-    InitializeCubism();
+    //setup cubism
+    cubismOption.LogFunction = live2DUtils::printMessage;
+    cubismOption.LoggingLevel = Csm::CubismFramework::Option::LogLevel_Verbose;
+    Csm::CubismFramework::StartUp(&live2DTools, &cubismOption);
 
-    SetExecuteAbsolutePath();
-
-    return GL_TRUE;
+    //Initialize cubism
+    Csm::CubismFramework::Initialize();
+    
+    return true;
 }
 
-void live2DSprite::Release()
+void live2DManager::loadModel(const std::string modelName)
 {
-    userModel->DeleteRenderer();
+    if (userModel != NULL)
+        releaseModel();
 
-    delete userModel;
-
-    Csm::CubismFramework::Dispose();
-}
-
-void live2DSprite::LoadModel(const std::string modelName)
-{
-    std::string currentModelDirectory = executeAbsolutePath + modelDirectory + modelName + "/";
+    std::string currentModelDirectory = resourceDirectory + modelName + "/";
 
     userModel = new live2DModel(modelName, currentModelDirectory);
 
     std::string json = ".model3.json";
     std::string fileName = modelName + json;
     userModel->loadModelConfig(fileName.c_str());
-
 }
 
-void live2DSprite::Update() {
+void live2DManager::releaseModel()
+{
+    if (userModel == NULL)
+        return;
+    
+    userModel->DeleteRenderer();
+    delete userModel;
+}
+
+void live2DManager::update() {
     int width, height;
 
     glViewport(0, 0, windowWidth, windowHeight);
@@ -132,8 +123,4 @@ void live2DSprite::Update() {
     userModel->update(sdl_window);
 
     SDL_GL_SwapWindow(sdl_window);
-}
-
-void live2DSprite::SetModelDirectory(const std::string modelDirectoryName) {
-	modelDirectory = modelDirectoryName;
 }

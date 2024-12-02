@@ -322,6 +322,8 @@ void live2DModel::releaseModel() {
     expressions.Clear();
 
     delete(modelJson);
+
+    releaseTextures();
 }
 
 

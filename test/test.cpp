@@ -1,11 +1,19 @@
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_error.h>
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_timer.h>
-#include <SDL2/SDL_video.h>
-#include <stdio.h>
-#include "live2DSprite.hpp"
+#include <iostream>
+#include <string>
+#include <unistd.h>
+#include "live2DManager.hpp"
 
+std::string getCurrentPath(void) {
+    const std::size_t MAXBUFSIZE = 2048;
+    char buf[MAXBUFSIZE] = {'\0'};
+    readlink("/proc/self/exe", buf, MAXBUFSIZE);
+    std::string tmp = std::string(buf);    // 0 is for heap memory
+	for (int i = tmp.length() - 1; tmp[i] != '/'; i--)
+		tmp.pop_back();
+	tmp += '/';
+	return tmp;
+}
 
 int main(int argc, char **argv) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
@@ -17,21 +25,15 @@ int main(int argc, char **argv) {
 		600, 800,
 		SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_OPENGL
 	);
-
-	SDL_GLContext context = SDL_GL_CreateContext(window);
-	if (context == NULL) {
-		printf("Failed make content, %s", SDL_GetError());
+	if (window == NULL)
 		return 1;
-	}
-	
-	SDL_GL_MakeCurrent(window, context);
 
-	live2DSprite sprite;
-	if (sprite.InitializeSystem(window) == false)
+	std::string currentPath = getCurrentPath();
+	live2DManager* live2d =  new live2DManager(currentPath + "Resources/");
+	if (live2d->initializeSystem(window) == false)
 		return 0;
-	sprite.SetModelDirectory("Resources/");
-	sprite.LoadModel("Hiyori");
-
+	live2d->loadModel("Hiyori");
+	
 	bool isQuit = false;
 	while (!isQuit) {
 		SDL_Event e;
@@ -39,8 +41,9 @@ int main(int argc, char **argv) {
 			if (e.type == SDL_QUIT)
 				isQuit = true;
 		}
-		sprite.Update();
+		live2d->update();
 	}
 
-	sprite.Release();
+	delete live2d;
+	SDL_DestroyWindow(window);
 }
