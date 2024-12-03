@@ -20,7 +20,6 @@ Csm::CubismFramework::Option cubismOption;
 std::string resourceDirectory;
 
 SDL_Window* sdl_window;
-SDL_GLContext sdl_glContext;
 int windowWidth, windowHeight;
 
 // function(s)
@@ -33,7 +32,6 @@ live2DManager::live2DManager(std::string modelDirectoryName)
 live2DManager::~live2DManager() {
     releaseModel();
     Csm::CubismFramework::Dispose();
-    SDL_GL_DeleteContext(sdl_glContext);
 }
 
 bool live2DManager::initializeSystem(SDL_Window *window)
@@ -43,14 +41,7 @@ bool live2DManager::initializeSystem(SDL_Window *window)
         return false;
     }
     sdl_window = window;
- 
-	sdl_glContext = SDL_GL_CreateContext(window); 
-    if (sdl_glContext == NULL) {
-        live2DUtils::printLogLn("Can't make openGL context, %s", SDL_GetError());
-        return false;
-    }
-	SDL_GL_MakeCurrent(sdl_window, sdl_glContext);
-
+    
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
         live2DUtils::printLogLn("Can't initilize glew.");
@@ -121,6 +112,4 @@ void live2DManager::update() {
     glClearDepth(1.0);
 
     userModel->update(sdl_window);
-
-    SDL_GL_SwapWindow(sdl_window);
 }
