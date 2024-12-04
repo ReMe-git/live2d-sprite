@@ -13,25 +13,32 @@
 // define(s)
 // type(s)
 // varible(s)
-live2DModel *userModel;
-live2DUtils live2DTools;
-Csm::CubismFramework::Option cubismOption;
+live2DManager* live2DManager::instance = NULL;
+live2DModel* userModel;
+live2DUtils util;
+Csm::CubismFramework::Option option;
 
-std::string resourceDirectory;
+std::string modelDirectory;
 
 SDL_Window* sdl_window;
 int windowWidth, windowHeight;
 
 // function(s)
-live2DManager::live2DManager(std::string modelDirectoryName)
+live2DManager::live2DManager()
 {
     userModel = NULL;
-    resourceDirectory = modelDirectoryName;
+    modelDirectory = "";
 }
 
 live2DManager::~live2DManager() {
     releaseModel();
     Csm::CubismFramework::Dispose();
+}
+
+live2DManager* live2DManager::getInstance() {
+	if (instance == NULL)
+		instance = new live2DManager();
+	return instance;
 }
 
 bool live2DManager::initializeSystem(SDL_Window *window)
@@ -58,9 +65,9 @@ bool live2DManager::initializeSystem(SDL_Window *window)
     glViewport(0, 0, windowWidth, windowHeight);
 
     //setup cubism
-    cubismOption.LogFunction = live2DUtils::printMessage;
-    cubismOption.LoggingLevel = Csm::CubismFramework::Option::LogLevel_Verbose;
-    Csm::CubismFramework::StartUp(&live2DTools, &cubismOption);
+    option.LogFunction = live2DUtils::printMessage;
+    option.LoggingLevel = Csm::CubismFramework::Option::LogLevel_Verbose;
+    Csm::CubismFramework::StartUp(&util, &option);
 
     //Initialize cubism
     Csm::CubismFramework::Initialize();
@@ -68,12 +75,17 @@ bool live2DManager::initializeSystem(SDL_Window *window)
     return true;
 }
 
+void live2DManager::setModelDirectory(std::string modelDirectoryName)
+{
+    modelDirectory = modelDirectoryName;
+}
+
 void live2DManager::loadModel(const std::string modelName)
 {
     if (userModel != NULL)
         releaseModel();
 
-    std::string currentModelDirectory = resourceDirectory + modelName + "/";
+    std::string currentModelDirectory = modelDirectory + modelName + "/";
 
     userModel = new live2DModel(modelName, currentModelDirectory);
 

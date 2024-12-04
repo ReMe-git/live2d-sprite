@@ -34,14 +34,15 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 	SDL_GL_MakeCurrent(window, context);
+	SDL_GL_SetSwapInterval(1);
 
 	std::string currentPath = getCurrentPath();
 	
-	live2DManager* live2d =  new live2DManager(currentPath + "Resources/");
-	if (live2d->initializeSystem(window) == false)
+	live2DManager::getInstance()->setModelDirectory(currentPath + "Resources/");
+	if (live2DManager::getInstance()->initializeSystem(window) == false)
 		return 0;
 	
-	live2d->loadModel("Hiyori");
+	live2DManager::getInstance()->loadModel("Hiyori");
 	bool isQuit = false;
 	while (!isQuit) {
 		SDL_Event e;
@@ -49,11 +50,10 @@ int main(int argc, char **argv) {
 			if (e.type == SDL_QUIT)
 				isQuit = true;
 		}
-		live2d->update();
+		live2DManager::getInstance()->update();
 		SDL_GL_SwapWindow(window);
 	}
 
-	delete live2d;
 	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
 }
