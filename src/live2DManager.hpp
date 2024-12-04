@@ -7,11 +7,12 @@ public:
 	~live2DManager();
 	
 	static live2DManager* getInstance();
-	bool initializeSystem(SDL_Window *window);
+	bool init(SDL_Window *window);
+	void update();
+	void destroy();
 	void setModelDirectory(std::string modelDirectoryName);
 	void loadModel(const std::string modelName);
 	void releaseModel();
-	void update();
 
 private:
 	static live2DManager* instance;

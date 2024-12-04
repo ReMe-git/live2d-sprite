@@ -38,11 +38,12 @@ int main(int argc, char **argv) {
 
 	std::string currentPath = getCurrentPath();
 	
-	live2DManager::getInstance()->setModelDirectory(currentPath + "Resources/");
-	if (live2DManager::getInstance()->initializeSystem(window) == false)
+	if (live2DManager::getInstance()->init(window) == false)
 		return 0;
 	
+	live2DManager::getInstance()->setModelDirectory(currentPath + "Resources/");
 	live2DManager::getInstance()->loadModel("Hiyori");
+	
 	bool isQuit = false;
 	while (!isQuit) {
 		SDL_Event e;
@@ -53,7 +54,8 @@ int main(int argc, char **argv) {
 		live2DManager::getInstance()->update();
 		SDL_GL_SwapWindow(window);
 	}
-
+	
+	live2DManager::getInstance()->destroy();
 	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
 }

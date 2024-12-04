@@ -31,8 +31,6 @@ live2DManager::live2DManager()
 }
 
 live2DManager::~live2DManager() {
-    releaseModel();
-    Csm::CubismFramework::Dispose();
 }
 
 live2DManager* live2DManager::getInstance() {
@@ -41,17 +39,17 @@ live2DManager* live2DManager::getInstance() {
 	return instance;
 }
 
-bool live2DManager::initializeSystem(SDL_Window *window)
+bool live2DManager::init(SDL_Window *window)
 {
     if (window == NULL) {
-        live2DUtils::printLogLn("Invalid SDL Window");
+        live2DUtils::printLogLn("init: Invalid SDL Window");
         return false;
     }
     sdl_window = window;
     
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
-        live2DUtils::printLogLn("Can't initilize glew.");
+        live2DUtils::printLogLn("init: Can't initilize glew.");
         return false;
     }
 
@@ -75,34 +73,6 @@ bool live2DManager::initializeSystem(SDL_Window *window)
     return true;
 }
 
-void live2DManager::setModelDirectory(std::string modelDirectoryName)
-{
-    modelDirectory = modelDirectoryName;
-}
-
-void live2DManager::loadModel(const std::string modelName)
-{
-    if (userModel != NULL)
-        releaseModel();
-
-    std::string currentModelDirectory = modelDirectory + modelName + "/";
-
-    userModel = new live2DModel(modelName, currentModelDirectory);
-
-    std::string json = ".model3.json";
-    std::string fileName = modelName + json;
-    userModel->loadModelConfig(fileName.c_str());
-}
-
-void live2DManager::releaseModel()
-{
-    if (userModel == NULL)
-        return;
-    
-    userModel->DeleteRenderer();
-    delete userModel;
-}
-
 void live2DManager::update() {
     int width, height;
 
@@ -124,4 +94,41 @@ void live2DManager::update() {
     glClearDepth(1.0);
 
     userModel->update(sdl_window);
+}
+
+void live2DManager::destroy() {
+    releaseModel();
+    Csm::CubismFramework::Dispose();
+}
+
+void live2DManager::setModelDirectory(std::string modelDirectoryName)
+{
+    modelDirectory = modelDirectoryName;
+}
+
+void live2DManager::loadModel(const std::string modelName)
+{
+    if (userModel != NULL) {
+        live2DUtils::printLogLn("loadModel: There is a model running.");
+        return;
+	}
+
+    std::string currentModelDirectory = modelDirectory + modelName + "/";
+
+    userModel = new live2DModel(modelName, currentModelDirectory);
+
+    std::string json = ".model3.json";
+    std::string fileName = modelName + json;
+    userModel->loadModelConfig(fileName.c_str());
+}
+
+void live2DManager::releaseModel()
+{
+    if (userModel == NULL) {
+		live2DUtils::printLogLn("releaseModel: No model to release.");
+        return;
+	}
+    
+    userModel->DeleteRenderer();
+    delete userModel;
 }
