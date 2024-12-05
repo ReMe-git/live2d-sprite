@@ -42,6 +42,7 @@ private:
     Csm::csmFloat32 delaySeconds;
     Csm::CubismModelSettingJson* modelJson;
     Csm::csmVector<Csm::CubismIdHandle> eyeBlinkIds;
+    Csm::csmVector<Csm::CubismIdHandle> lipSyncIds;
     Csm::csmMap<Csm::csmString, Csm::ACubismMotion*> motions;
     Csm::csmMap<Csm::csmString, Csm::ACubismMotion*> expressions;
     
@@ -52,12 +53,12 @@ private:
     const Csm::csmInt32 priorityNormal = 2;
     const Csm::csmInt32 priorityForce = 3;
 
-    const Csm::CubismId* _idParamAngleX; // ParamAngleX
-    const Csm::CubismId* _idParamAngleY; // ParamAngleX
-    const Csm::CubismId* _idParamAngleZ; // ParamAngleX
-    const Csm::CubismId* _idParamBodyAngleX; // ParamBodyAngleX
-    const Csm::CubismId* _idParamEyeBallX; // ParamEyeBallX
-    const Csm::CubismId* _idParamEyeBallY; // ParamEyeBallXY
+    const Csm::CubismId* _idParamAngleX;
+    const Csm::CubismId* _idParamAngleY;
+    const Csm::CubismId* _idParamAngleZ;
+    const Csm::CubismId* _idParamBodyAngleX;
+    const Csm::CubismId* _idParamEyeBallX;
+    const Csm::CubismId* _idParamEyeBallY;
 
     TextureInfo* createTextureFromPngFile(std::string fileName);
     void releaseTextures();
@@ -70,6 +71,9 @@ private:
         Csm::csmInt32 priority,
         Csm::ACubismMotion::FinishedMotionCallback onFinishedMotionHandler = NULL
     );
+    void releaseMotions();
+    void setExpression(const Csm::csmChar *expressionID);
+    void releaseExpressions();
     void modelParamUpdate();
 }; // live2DModel
 

@@ -183,6 +183,7 @@ void live2DModel::setupModel() {
         releaseBuffer(buffer);
     }
 
+    // expression
     if (modelJson->GetExpressionCount() > 0)
     {
         const csmInt32 count = modelJson->GetExpressionCount();
@@ -209,6 +210,7 @@ void live2DModel::setupModel() {
         }
     }
 
+    // pose
     if (strcmp(modelJson->GetPoseFileName(), ""))
     {
         csmString path = modelJson->GetPoseFileName();
@@ -219,6 +221,7 @@ void live2DModel::setupModel() {
         releaseBuffer(buffer);
     }
 
+    // physics
     if (strcmp(modelJson->GetPhysicsFileName(), ""))
     {
         csmString path = modelJson->GetPhysicsFileName();
@@ -229,6 +232,7 @@ void live2DModel::setupModel() {
         releaseBuffer(buffer);
     }
 
+    // userdata
     if (strcmp(modelJson->GetUserDataFile(), ""))
     {
         csmString path = modelJson->GetUserDataFile();
@@ -236,6 +240,45 @@ void live2DModel::setupModel() {
         buffer = createBuffer(path.GetRawString(), &size);
         LoadUserData(buffer, size);
         releaseBuffer(buffer);
+    }
+
+    //eyeblink
+    if (modelJson->GetEyeBlinkParameterCount() > 0)
+    {
+        _eyeBlink = CubismEyeBlink::Create(modelJson);
+    }
+
+    //breath
+    {
+        _breath = CubismBreath::Create();
+
+        csmVector<CubismBreath::BreathParameterData> breathParameters;
+
+        breathParameters.PushBack(CubismBreath::BreathParameterData(_idParamAngleX, 0.0f, 15.0f, 6.5345f, 0.5f));
+        breathParameters.PushBack(CubismBreath::BreathParameterData(_idParamAngleY, 0.0f, 8.0f, 3.5345f, 0.5f));
+        breathParameters.PushBack(CubismBreath::BreathParameterData(_idParamAngleZ, 0.0f, 10.0f, 5.5345f, 0.5f));
+        breathParameters.PushBack(CubismBreath::BreathParameterData(_idParamBodyAngleX, 0.0f, 4.0f, 15.5345f, 0.5f));
+        breathParameters.PushBack(CubismBreath::BreathParameterData(CubismFramework::GetIdManager()->GetId(ParamBreath), 0.5f, 0.5f, 3.2345f, 0.5f));
+
+        _breath->SetParameters(breathParameters);
+    }
+
+    // eyeblinkIds
+    {
+        csmInt32 eyeBlinkIdCount = modelJson->GetEyeBlinkParameterCount();
+        for (csmInt32 i = 0; i < eyeBlinkIdCount; ++i)
+        {
+            eyeBlinkIds.PushBack(modelJson->GetEyeBlinkParameterId(i));
+        }
+    }
+
+    // lipsyncIds
+    {
+        csmInt32 lipSyncIdCount = modelJson->GetLipSyncParameterCount();
+        for (csmInt32 i = 0; i < lipSyncIdCount; ++i)
+        {
+            lipSyncIds.PushBack(modelJson->GetLipSyncParameterId(i));
+        }
     }
 
     csmMap<csmString, csmFloat32> layout;
@@ -301,31 +344,13 @@ void live2DModel::preloadMotionGroup(const csmChar* group)
 }
 
 void live2DModel::releaseModel() {
-    for (
-        Csm::csmMap<Csm::csmString,
-        Csm::ACubismMotion*>::const_iterator iter = motions.Begin();
-        iter != motions.End(); ++iter 
-    ) {
-        Csm::ACubismMotion::Delete(iter->Second);
-    }
-
-    motions.Clear();
-
-    for (
-        Csm::csmMap<Csm::csmString,
-        Csm::ACubismMotion*>::const_iterator iter = expressions.Begin();
-        iter != expressions.End(); ++iter
-    ) {
-        Csm::ACubismMotion::Delete(iter->Second);
-    }
-
-    expressions.Clear();
+    releaseMotions();
+    releaseExpressions();
 
     delete(modelJson);
 
     releaseTextures();
 }
-
 
 Csm::CubismMotionQueueEntryHandle live2DModel::startMotion(
     const Csm::csmChar* group,
@@ -333,7 +358,6 @@ Csm::CubismMotionQueueEntryHandle live2DModel::startMotion(
     Csm::csmInt32 priority,
     Csm::ACubismMotion::FinishedMotionCallback onFinishedMotionHandler
 ) {
-     // モーション数が取得出来なかった、もしくは0の時
     if (!(modelJson->GetMotionCount(group)))
     {
         return Csm::InvalidMotionQueueEntryHandleValue;
@@ -378,6 +402,7 @@ Csm::CubismMotionQueueEntryHandle live2DModel::startMotion(
                 motion->SetFadeOutTime(fadeTime);
             }
 
+            motion->SetEffectIds(eyeBlinkIds, lipSyncIds);
             autoDelete = true;
         }
 
@@ -390,6 +415,37 @@ Csm::CubismMotionQueueEntryHandle live2DModel::startMotion(
 
     return  _motionManager->StartMotionPriority(motion, autoDelete, priority);   
 }
+
+void live2DModel::releaseMotions()
+{
+    for (csmMap<csmString, ACubismMotion*>::const_iterator iter = motions.Begin(); iter != motions.End(); ++iter)
+    {
+        ACubismMotion::Delete(iter->Second);
+    }
+
+    motions.Clear();
+}
+
+void live2DModel::setExpression(const csmChar* expressionID)
+{
+    ACubismMotion* motion = expressions[expressionID];
+    
+    if (motion != NULL)
+    {
+        _expressionManager->StartMotionPriority(motion, false, priorityForce);
+    }
+}
+
+void live2DModel::releaseExpressions()
+{
+    for (csmMap<csmString, ACubismMotion*>::const_iterator iter = expressions.Begin(); iter != expressions.End(); ++iter)
+    {
+        ACubismMotion::Delete(iter->Second);
+    }
+
+    expressions.Clear();
+}
+
 
 void live2DModel::modelParamUpdate() {
     const Csm::csmFloat32 deltaTimeSeconds = live2DUtils::getDeltaTime();
@@ -414,6 +470,19 @@ void live2DModel::modelParamUpdate() {
 
     _model->SaveParameters();
 
+    // opacity
+    _opacity = _model->GetModelOpacity();
+
+    // eyeblink
+    if (!motionUpdated)
+    {
+        if (_eyeBlink != NULL)
+        {
+            _eyeBlink->UpdateParameters(_model, deltaTimeSeconds);
+        }
+    }
+
+    // expression
     if (_expressionManager)
     {
         _expressionManager->UpdateMotion(_model, deltaTimeSeconds);
@@ -427,12 +496,28 @@ void live2DModel::modelParamUpdate() {
 
     _model->AddParameterValue(_idParamEyeBallX, _dragX);
     _model->AddParameterValue(_idParamEyeBallY, _dragY);
-
+    
+    // breath
+    if (_breath != NULL)
+    {
+        _breath->UpdateParameters(_model, deltaTimeSeconds);
+    }
+    // physics
     if (_physics)
     {
         _physics->Evaluate(_model, deltaTimeSeconds);
     }
 
+    // lipsync
+    if (_lipSync) {
+        csmFloat32 value = 0.0f;
+
+        for (csmUint32 i = 0; i < lipSyncIds.GetSize(); i++) {
+            _model->AddParameterValue(lipSyncIds[i], value, 0.8f);
+        }
+    }
+
+    // pose
     if (_pose)
     {
         _pose->UpdateParameters(_model, deltaTimeSeconds);
