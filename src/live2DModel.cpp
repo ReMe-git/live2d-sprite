@@ -9,6 +9,7 @@
 #include <Rendering/OpenGL/CubismRenderer_OpenGLES2.hpp>
 #include <Motion/CubismMotionQueueEntry.hpp>
 #include <Id/CubismIdManager.hpp>
+#include <cstddef>
 
 #include "Type/CubismBasicType.hpp"
 #include "Type/csmString.hpp"
@@ -136,13 +137,17 @@ void live2DModel::setupTextures()
     GetRenderer<Rendering::CubismRenderer_OpenGLES2>()->IsPremultipliedAlpha(false);
 }
 
+void live2DModel::setLipsync(live2DLipsync *handle) {
+    lipsync = handle;
+}
 
 live2DModel::live2DModel(const std::string modelName, const std::string modelPath)
     : CubismUserModel(),
     modelJson(NULL),
     delaySeconds(0.0f),
     modelName(modelName),
-    modelPath(modelPath) {
+    modelPath(modelPath),
+    lipsync(NULL) {
     _idParamAngleX = CubismFramework::GetIdManager()->GetId(ParamAngleX);
     _idParamAngleY = CubismFramework::GetIdManager()->GetId(ParamAngleY);
     _idParamAngleZ = CubismFramework::GetIdManager()->GetId(ParamAngleZ);
@@ -348,7 +353,8 @@ void live2DModel::releaseModel() {
     releaseExpressions();
 
     delete(modelJson);
-
+    delete(lipsync);
+    
     releaseTextures();
 }
 
@@ -509,9 +515,10 @@ void live2DModel::modelParamUpdate() {
     }
 
     // lipsync
-    if (_lipSync) {
+    if (_lipSync and lipsync != NULL) {
         csmFloat32 value = 0.0f;
 
+        value = lipsync->getValue();
         for (csmUint32 i = 0; i < lipSyncIds.GetSize(); i++) {
             _model->AddParameterValue(lipSyncIds[i], value, 0.8f);
         }

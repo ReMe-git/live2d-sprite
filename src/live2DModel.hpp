@@ -1,9 +1,7 @@
 #ifndef LIVE2D_MODEL
 #define LIVE2D_MODEL
 
-#include "Type/CubismBasicType.hpp"
 #include <cstddef>
-#include <functional>
 #include <string>
 
 #include <GL/glew.h>
@@ -11,6 +9,9 @@
 #include <CubismFramework.hpp>
 #include <Model/CubismUserModel.hpp>
 #include <CubismModelSettingJson.hpp>
+
+#include "Type/CubismBasicType.hpp"
+#include "live2DLipsync.hpp"
 
 class live2DModel : 
     public Csm::CubismUserModel
@@ -22,6 +23,7 @@ public:
     void loadModelConfig(const Csm::csmChar* configFileName);
     void setupModel();
     void releaseModel();
+    void setLipsync(live2DLipsync *handle);
     void update(SDL_Window *window);
 
 
@@ -60,6 +62,8 @@ private:
     const Csm::CubismId* _idParamEyeBallX;
     const Csm::CubismId* _idParamEyeBallY;
 
+    live2DLipsync *lipsync;
+    
     TextureInfo* createTextureFromPngFile(std::string fileName);
     void releaseTextures();
     void setupTextures();
