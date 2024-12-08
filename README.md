@@ -2,6 +2,9 @@
 
 live2d library build with CubismNativeSDK and SDL.
 
+## Require
+SDL, OpenGL, CubismNativeSDK
+
 ## Building:
 1. make sure you install SDL library;
 1. download CubismNativeSDK and unzip it to cubism/;
@@ -16,10 +19,19 @@ live2d library build with CubismNativeSDK and SDL.
 ## Use in another project
 add these into your CMakeLists.txt
 ```
-add_library(live2d-sprite STATIC IMPORTED)
-set_target_properties(live2d-sprite
+find_package(OpenGL REQUIRED)
+find_package(SDL2 REQUIRED)
+
+add_library(live2DSprite STATIC IMPORTED)
+set_target_properties(live2DSprite
   PROPERTIES
   IMPORTED_LOCATION <install-dir>/lib/liblive2DSprite.a
   INTERFACE_INCLUDE_DIRECTORIES <install-dir>/include
+)
+
+target_link_libraries(<app-name> PRIVATE
+    live2DSprite
+    SDL2::SDL2
+    OpenGL::GL
 )
 ```
