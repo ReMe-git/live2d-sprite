@@ -1,4 +1,4 @@
-target_sources(${LIB_NAME}
+target_sources(live2DManager
 PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}/live2DManager.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/live2DManager.cpp

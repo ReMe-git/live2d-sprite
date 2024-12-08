@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
 project(live2DSprite)
-# Set lib name.
-set(LIB_NAME live2DSprite)
 
 # Set directory paths.
 set(CORE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cubism/Core)
@@ -10,9 +8,6 @@ set(FRAMEWORK_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cubism/Framework)
 set(THIRD_PARTY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
 set(STB_PATH ${THIRD_PARTY_PATH}/stb)
 set(GLEW_PATH ${THIRD_PARTY_PATH}/glew)
-
-# Force static library.
-add_library(${LIB_NAME} STATIC)
 
 # Surpress GLEW and GLFW process.
 set(BUILD_UTILS OFF CACHE BOOL "" FORCE)
@@ -47,31 +42,48 @@ find_package(OpenGL REQUIRED)
 # Find SDL libraries
 find_package(SDL2 REQUIRED)
 
+add_library(live2DManager STATIC)
 # Add source files.
 add_subdirectory(src)
 # Link libraries to app.
-target_link_libraries(${LIB_NAME}
-  Framework
+target_link_libraries(live2DManager
   SDL2::SDL2
+  Framework
 )
 # Specify include directories.
-target_include_directories(${LIB_NAME} PRIVATE ${STB_PATH})
+target_include_directories(live2DManager PRIVATE ${STB_PATH})
 
 add_custom_command(
-	TARGET ${LIB_NAME}
+	TARGET live2DManager
 	POST_BUILD
+	COMMAND ar x ${CMAKE_CURRENT_BINARY_DIR}/framework/libFramework.a
+	COMMAND ar x ${CORE_PATH}/lib/linux/x86_64/libLive2DCubismCore.a
+	COMMAND ar x ${CMAKE_CURRENT_BINARY_DIR}/lib/libGLEW.a
+	COMMAND ar x ${CMAKE_CURRENT_BINARY_DIR}/liblive2DManager.a
+	COMMAND ar r lib${PROJECT_NAME}.a *.o
 	COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/include
 	COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/src/live2DManager.hpp ${CMAKE_CURRENT_BINARY_DIR}/include
 	COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/src/live2DLipsync.hpp ${CMAKE_CURRENT_BINARY_DIR}/include
 	COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/cubism/Samples/Resources ${CMAKE_CURRENT_BINARY_DIR}
 )
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${OBJECT_NAME}.a DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-
+add_library(live2DSprite STATIC IMPORTED)
+# Find library path.
+set_target_properties(live2DSprite
+  PROPERTIES
+  IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/liblive2DSprite.a
+  INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_BINARY_DIR}/include
+)
 set(TEST_NAME live2d-sprite)
 add_executable(${TEST_NAME})
 set(TEST_PATH ${CMAKE_CURRENT_SOURCE_DIR}/test)
 target_link_libraries(${TEST_NAME}
-	${LIB_NAME}
+	live2DSprite
+	SDL2::SDL2
+	OpenGL::GL
 )
 add_subdirectory(test)
 target_include_directories(${TEST_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include)
+
