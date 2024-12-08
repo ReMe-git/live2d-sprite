@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 #include <unistd.h>
-#include "live2DManager.hpp"
+#include "Live2DManager.hpp"
 
 std::string getCurrentPath(void) {
     const std::size_t MAXBUFSIZE = 2048;
@@ -38,11 +38,11 @@ int main(int argc, char **argv) {
 
 	std::string currentPath = getCurrentPath();
 	
-	if (live2DManager::getInstance()->init(window) == false)
+	if (Live2DManager::GetInstance()->Init(window) == false)
 		return 0;
 	
-	live2DManager::getInstance()->setModelDirectory(currentPath + "Resources/");
-	live2DManager::getInstance()->loadModel("Hiyori");
+	Live2DManager::GetInstance()->SetModelDirectory(currentPath + "Resources/");
+	Live2DManager::GetInstance()->LoadModel("Hiyori");
 	
 	bool isQuit = false;
 	while (!isQuit) {
@@ -51,11 +51,11 @@ int main(int argc, char **argv) {
 			if (e.type == SDL_QUIT)
 				isQuit = true;
 		}
-		live2DManager::getInstance()->update();
+		Live2DManager::GetInstance()->Update();
 		SDL_GL_SwapWindow(window);
 	}
 	
-	live2DManager::getInstance()->destroy();
+	Live2DManager::GetInstance()->Destroy();
 	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
 }

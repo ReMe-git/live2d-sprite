@@ -1,5 +1,5 @@
 // include(s)
-#include "live2DUtils.hpp"
+#include "Live2DUtils.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -18,20 +18,20 @@ using namespace std;
 // type(s)
 // define(s)
 // varible(s)
-double live2DUtils::currentFrame = 0.0;
-double live2DUtils::lastFrame = 0.0;
-double live2DUtils::deltaTime = 0.0;
+double Live2DUtils::current_frame = 0.0;
+double Live2DUtils::last_frame = 0.0;
+double Live2DUtils::delta_time = 0.0;
 
 // function(s)
-csmByte* live2DUtils::loadFileAsBytes(const string filePath, csmSizeInt* outSize)
+csmByte* Live2DUtils::LoadFileAsBytes(const string file_path, csmSizeInt* out_size)
 {
-    const char* path = filePath.c_str();
+    const char* path = file_path.c_str();
 
     int size = 0;
-    struct stat statBuf;
-    if (stat(path, &statBuf) == 0)
+    struct stat stat_buf;
+    if (stat(path, &stat_buf) == 0)
     {
-        size = statBuf.st_size;
+        size = stat_buf.st_size;
 
         if (size == 0)
         {
@@ -54,38 +54,38 @@ csmByte* live2DUtils::loadFileAsBytes(const string filePath, csmSizeInt* outSize
     file.read(buf, size);
     file.close();
 
-    *outSize = size;
+    *out_size = size;
     return reinterpret_cast<csmByte*>(buf);
 }
 
-void live2DUtils::releaseBytes(csmByte* byteData)
+void Live2DUtils::ReleaseBytes(csmByte* byte_data)
 {
-    delete[] byteData;
+    delete[] byte_data;
 }
 
-csmFloat32  live2DUtils::getDeltaTime()
+csmFloat32  Live2DUtils::GetDeltaTime()
 {
-    return static_cast<csmFloat32>(deltaTime);
+    return static_cast<csmFloat32>(delta_time);
 }
 
-void live2DUtils::updateTime()
+void Live2DUtils::UpdateTime()
 {
-    currentFrame = SDL_GetTicks64() / 1000.0f;
-    deltaTime = currentFrame - lastFrame;
-    lastFrame = currentFrame;
+    current_frame = SDL_GetTicks64() / 1000.0f;
+    delta_time = current_frame - last_frame;
+    last_frame = current_frame;
 }
 
-void* live2DUtils::Allocate(const csmSizeType size)
+void* Live2DUtils::Allocate(const csmSizeType size)
 {
     return malloc(size);
 }
 
-void live2DUtils::Deallocate(void* memory)
+void Live2DUtils::Deallocate(void* memory)
 {
     free(memory);
 }
 
-void* live2DUtils::AllocateAligned(const csmSizeType size, const csmUint32 alignment)
+void* Live2DUtils::AllocateAligned(const csmSizeType size, const csmUint32 alignment)
 {
     size_t offset, shift, alignedAddress;
     void* allocation;
@@ -110,7 +110,7 @@ void* live2DUtils::AllocateAligned(const csmSizeType size, const csmUint32 align
     return reinterpret_cast<void*>(alignedAddress);
 }
 
-void live2DUtils::DeallocateAligned(void* alignedMemory)
+void Live2DUtils::DeallocateAligned(void* alignedMemory)
 {
     void** preamble;
 
@@ -119,7 +119,7 @@ void live2DUtils::DeallocateAligned(void* alignedMemory)
     Deallocate(preamble[-1]);
 }
 
-void live2DUtils::printLog(const csmChar* format, ...)
+void Live2DUtils::PrintLog(const csmChar* format, ...)
 {
     va_list args;
     csmChar buf[256];
@@ -129,7 +129,7 @@ void live2DUtils::printLog(const csmChar* format, ...)
     va_end(args);
 }
 
-void live2DUtils::printLogLn(const csmChar* format, ...)
+void Live2DUtils::PrintLogLn(const csmChar* format, ...)
 {
     va_list args;
     csmChar buf[256];
@@ -139,12 +139,12 @@ void live2DUtils::printLogLn(const csmChar* format, ...)
     va_end(args);
 }
 
-void live2DUtils::printMessage(const csmChar* message)
+void Live2DUtils::PrintMessage(const csmChar* message)
 {
-    printLog("%s", message);
+    PrintLog("%s", message);
 }
 
-void live2DUtils::printMessageLn(const csmChar* message)
+void Live2DUtils::PrintMessageLn(const csmChar* message)
 {
-    printLogLn("%s", message);
+    PrintLogLn("%s", message);
 }
